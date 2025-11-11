@@ -1,0 +1,12 @@
+[project]
+name = "hmac-python"
+version = "0.1.0"
+description = "API for sign and verify messages by HMAC"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.121.1",
+    "httpx>=0.28.1",
+    "pytest>=9.0.0",
+    "uvicorn>=0.38.0",
+]
