@@ -1,4 +1,4 @@
-"""Module with FastAPI application"""
+"""Module with FastAPI application."""
 
 from fastapi import FastAPI
 

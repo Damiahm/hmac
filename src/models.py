@@ -1,21 +1,16 @@
-"""Module with models"""
+"""Module with request/response models."""
 
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class SignRequest:
-    """Model for /sign request"""
-    msg: str
+from pydantic import BaseModel
 
 
-@dataclass(frozen=True)
-class VerifyRequest:
-    """Model for /verify request"""
-    msg: str
-    signature: str
+class SignRequest(BaseModel):
+    """Model for /sign request."""
+
+    msg: str | None = None
 
 
-@dataclass(frozen=True)
-class VerifyResponse:
-    """Model for /verify response"""
-    ok: bool
+class VerifyRequest(BaseModel):
+    """Model for /verify request."""
+
+    msg: str | None = None
+    signature: str | None = None

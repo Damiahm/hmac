@@ -1,11 +1,11 @@
-"""Main module for run FastAPI application"""
+"""Main module for running FastAPI application."""
 
 import uvicorn
 
-from src.app import app 
+from src.app import app
+from src.config import get_config
 
 
-if __name__ == '__main__':
-    host = '' # TODO: хост должен получаться из config.json
-    port = 1  # TODO: порт должен получаться из config.json
-    uvicorn.run(app, host=host, port=int(port))
+if __name__ == "__main__":
+    config = get_config()
+    uvicorn.run(app, host=config.listen_host, port=config.listen_port)
