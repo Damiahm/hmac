@@ -11,8 +11,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from constants import B64URL_LEN_K
+
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
 CONFIG_ENV_VAR = "CONFIG_PATH"
+
+_PORT_RANGE = (1, 65535)
 
 
 class ConfigError(RuntimeError):
@@ -42,7 +46,7 @@ def _ensure_exists(path: Path) -> None:
 def _decode_secret(secret_raw: str) -> bytes:
     if not isinstance(secret_raw, str) or not secret_raw:
         raise ConfigError("Secret must be a non-empty string")
-    padding = "=" * (-len(secret_raw) % 4)
+    padding = "=" * (-len(secret_raw) % B64URL_LEN_K)
     try:
         secret = base64.urlsafe_b64decode(secret_raw + padding)
     except (binascii.Error, ValueError) as exc:
@@ -67,8 +71,8 @@ def _parse_listen(listen: str) -> tuple[str, int]:
         port = int(port_str)
     except ValueError as exc:
         raise ConfigError("listen port must be integer") from exc
-    if port <= 0 or port > 65535:
-        raise ConfigError("listen port must be in 1-65535 range")
+    if port < _PORT_RANGE[0] or port > _PORT_RANGE[1]:
+        raise ConfigError(f"listen port must be in {_PORT_RANGE[0]}-{_PORT_RANGE[1]} range")
     return host, port
 
 

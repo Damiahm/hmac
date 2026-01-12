@@ -7,8 +7,9 @@ import binascii
 import re
 from typing import Final
 
-_B64URL_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Za-z0-9\-_]+$")
+from .constants import B64URL_LEN_K
 
+_B64URL_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Za-z0-9\-_]+$")
 
 class CodecError(ValueError):
     """Raised when signature encoding/decoding fails."""
@@ -28,7 +29,7 @@ def decode_signature(signature: str) -> bytes:
     if not _B64URL_RE.fullmatch(signature):
         raise CodecError("Signature must contain only base64url characters")
 
-    padding = "=" * (-len(signature) % 4)
+    padding = "=" * (-len(signature) % B64URL_LEN_K)
     try:
         decoded = base64.urlsafe_b64decode(signature + padding)
     except (binascii.Error, ValueError) as exc:

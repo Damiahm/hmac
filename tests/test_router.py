@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from fastapi import status
 from fastapi.testclient import TestClient
 
 from src.config import CONFIG_ENV_VAR, reset_config_cache
@@ -30,14 +31,14 @@ def client(monkeypatch, tmp_path) -> TestClient:
 
 def test_sign_and_verify_success(client: TestClient) -> None:
     resp = client.post("/sign", json={"msg": "hello"})
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     signature = resp.json()["signature"]
 
     verify_resp = client.post("/verify", json={
         "msg": "hello", 
         "signature": signature
     })
-    assert verify_resp.status_code == 200
+    assert verify_resp.status_code == status.HTTP_200_OK
     assert verify_resp.json() == {"ok": True}
 
 
@@ -52,7 +53,7 @@ def test_verify_wrong_signature(client: TestClient) -> None:
             "signature": bad_signature
         }
     )
-    assert verify_resp.status_code == 200
+    assert verify_resp.status_code == status.HTTP_200_OK
     assert verify_resp.json() == {"ok": False}
 
 
@@ -63,7 +64,7 @@ def test_verify_wrong_message(client: TestClient) -> None:
         "msg": "hello!", 
         "signature": signature
     })
-    assert verify_resp.status_code == 200
+    assert verify_resp.status_code == status.HTTP_200_OK
     assert verify_resp.json() == {"ok": False}
 
 
@@ -72,18 +73,18 @@ def test_invalid_signature_format(client: TestClient) -> None:
         "msg": "hello", 
         "signature": "@@@"
     })
-    assert verify_resp.status_code == 400
+    assert verify_resp.status_code == status.HTTP_400_BAD_REQUEST
     assert verify_resp.json()["detail"] == "invalid_signature_format"
 
 
 def test_empty_message_rejected(client: TestClient) -> None:
     resp = client.post("/sign", json={"msg": ""})
-    assert resp.status_code == 400
+    assert resp.status_code == status.HTTP_400_BAD_REQUEST
     assert resp.json()["detail"] == "invalid_msg"
 
 
 def test_payload_too_large(client: TestClient) -> None:
     long_msg = "a" * 64  # greater than max_msg_size_bytes=32
     resp = client.post("/sign", json={"msg": long_msg})
-    assert resp.status_code == 413
+    assert resp.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
     assert resp.json()["detail"] == "payload_too_large"

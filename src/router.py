@@ -41,7 +41,7 @@ async def sign(
     msg_len = len(request.msg.encode("utf-8"))
     signature_bytes = hmac_service.sign(request.msg)
     signature = encode_signature(signature_bytes)
-    logger.info("sign ok len=%d", msg_len)
+    logger.info(f"sign ok len={msg_len}")
     return {"signature": signature}
 
 
@@ -72,5 +72,5 @@ async def verify(
         )
 
     ok = hmac_service.verify(request.msg, signature_bytes)
-    logger.info("verify len=%d ok=%s", len(request.msg.encode("utf-8")), ok)
+    logger.info(f"verify len={len(request.msg.encode('utf-8'))} ok={ok}")
     return {"ok": ok}
